@@ -7,23 +7,23 @@ class FetchDogImage extends Component {
       img: '',
       loading: true,
       previousImg: [],
-      dogRace: '',
+      dogBreed: '',
+      imgLoaded: false,
     }
     this.fetchDogImage = this.fetchDogImage.bind(this);
     this.updateDogImage = this.updateDogImage.bind(this);
+    this.handleImgLoad = this.handleImgLoad.bind(this);
   }
 
   async fetchDogImage() {
     const url = await fetch('https://dog.ceo/api/breeds/image/random')
       .then((data) => data.json())
       .then((data) => data.message)
-    const dogRace = url.split('/')[4];
     this.setState({
       img: url,
       loading: false,
-      dogRace: dogRace,
+      dogBreed: url.split('/')[4],
     })
-    alert(`Raça: ${this.state.dogRace}`)
   }
   
   componentDidMount() {
@@ -34,20 +34,27 @@ class FetchDogImage extends Component {
     this.setState((prevState) => ({
       previousImg: [...prevState.previousImg, this.state.img],
       loading: true,
+      imgLoaded: false,
     }))
     this.fetchDogImage()
   }
 
+  handleImgLoad() {
+    this.setState({
+      imgLoaded: true,
+    })
+  }
+
   render() {
-    const imgContainer = (
-      <>
-        <img src={ this.state.img } alt='Dog'></img>
-        <button type='button' onClick={this.updateDogImage}>Fecth Dog</button>
-      </>
-    )
     return(
       <>
-        { (this.state.loading) ? <span>Loading</span> : imgContainer }
+        { (this.state.loading) ? <span>Loading</span> : <img src={ this.state.img } alt='Dog'onLoad={this.handleImgLoad} ></img> }
+        { (this.state.imgLoaded) && 
+          <>
+            <p>Dog Breed: {this.state.dogBreed}</p>
+            <button type='button' onClick={this.updateDogImage}>Next</button>
+          </>
+         }
       </>
     )
   }
